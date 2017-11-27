@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<JWM>
+   <!-- vim: set expandtab ts=3 sw=3 ai : -->
+
+   <RootMenu height="20" onroot="12">
+
+      <Program icon="terminal.png" label="Terminal">vala-terminal -fs 8</Program>
+      
+      <Program icon="pico8.png" label="PICO-8">pico8</Program>
+
+      <Program icon="musicsequencer.png" label="SunVox">sunvox</Program>
+
+      <Program icon="filebrowser.png" label="File Manager">pcmanfm</Program>
+      
+      <Program icon="webbrowser.png" label="Internet">surf -n -p google.com</Program>
+
+      <Program icon="texteditor.png" label="Text Editor">leafpad</Program>
+      <Separator/>
+
+      <Program icon="virtualboy.png" label="LSDJ">VisualBoyAdvance -1 /home/chip/lsdj.gb</Program>
+
+      <Separator/>
+
+      <Menu label="More">
+         <Program label="Shutdown">vala-terminal -e sudo shutdown now</Program>
+         <Program label="Reboot">vala-terminal -e sudo reboot</Program>
+         <Separator/>
+         <Restart label="Reload .jwmrc" icon="restart.png"/>
+         <Exit label="Exit JWM" confirm="true" icon="quit.png"/>
+      </Menu>
+
+   </RootMenu>
+
+   <Group>
+      <Name>vala-terminal|leafpad</Name>
+      <Option>maximized</Option>
+   </Group>
+
+   <Group>
+      <Name>sunvox|pico|pcmanfm|surf</Name>
+      <Option>notitle</Option>
+      <Option>noborder</Option>
+   </Group>
+
+   <Group>
+      <Name>VisualBoyAdvance</Name>
+   </Group>
+
+
+   <Tray x="0" y="-1" height="20" autohide="bottom" layer="above">
+
+      <TrayButton label="Start" popup="">root:1</TrayButton>
+
+      <Pager labeled="false"/>
+
+      <TaskList maxwidth="150"/>
+
+      <Dock/>
+
+      <!-- Additional Swallow attribute: height -->
+      <!--
+      <Swallow name="xload" width="64">
+         xload -nolabel -bg black -fg white -hl white
+      </Swallow>
+      -->
+
+      <Clock format="%H:%M"/>
+
+   </Tray>
+
+   <WindowStyle>
+
+      <Font>Sans-8:bold</Font>
+      <Width>2</Width>
+      <Height>15</Height>
+
+      <Active>
+         <Text>white</Text>
+         <Title>#ff007f</Title>
+         <Outline>white</Outline>
+         <Opacity>1</Opacity>
+         <Corner>1</Corner>
+      </Active>
+
+      <Inactive>
+         <Text>white</Text>
+         <Title>#ff007f</Title>
+         <Outline>black</Outline>
+         <Opacity>1</Opacity>
+         <Corner>1</Corner>
+      </Inactive>
+
+   </WindowStyle>
+
+   <TaskListStyle>
+      <Font>Sans-8</Font>
+      <ActiveForeground>#ff007f</ActiveForeground>
+      <ActiveBackground>white</ActiveBackground>
+      <Foreground>#ff007f</Foreground>
+      <Background>white</Background>
+      <Outline>black</Outline>
+   </TaskListStyle>
+
+   <TrayStyle>
+      <Font>Sans-8:bold</Font>
+      <Background>#ff007f</Background>
+      <Foreground>white</Foreground>
+      <Opacity>1</Opacity>
+      <Decorations>flat</Decorations>
+      <Outline>#ff007f</Outline>
+      <Active>
+         <Foreground>white</Foreground>
+         <Background>#ff007f</Background>
+      </Active>
+   </TrayStyle>
+
+   <PagerStyle>
+      <Outline>black</Outline>
+      <Foreground>gray90</Foreground>
+      <Background>#808488</Background>
+      <ActiveForeground>#70849d</ActiveForeground>
+      <ActiveBackground>#2e3a67</ActiveBackground>
+   </PagerStyle>
+
+   <MenuStyle>
+      <Font>Sans-8</Font>
+      <Foreground>white</Foreground>
+      <Background>#ff007f</Background>
+      <Outline>#ff007f</Outline>
+      <Corner>1</Corner>
+      <ActiveForeground>#ff007f</ActiveForeground>
+      <ActiveBackground>white</ActiveBackground>
+      <Opacity>1</Opacity>
+      <Decorations>flat</Decorations>
+   </MenuStyle>
+
+   <PopupStyle>
+      <Font>Sans-8</Font>
+      <Outline>white</Outline>
+      <Foreground>black</Foreground>
+      <Background>yellow</Background>
+   </PopupStyle>
+
+   <IconPath>/usr/share/pocket-home/appIcons/</IconPath>
+
+   <!-- Virtual Desktops -->
+   <Desktops width="2" height="2">
+      <Background type="solid">#4d4d4d</Background>
+   </Desktops>
+
+   <!-- Double click speed (in milliseconds) -->
+   <DoubleClickSpeed>400</DoubleClickSpeed>
+
+   <!-- Double click delta (in pixels) -->
+   <DoubleClickDelta>2</DoubleClickDelta>
+
+   <!-- The focus model (sloppy or click) -->
+   <FocusModel>click</FocusModel>
+
+   <!-- The snap mode (none, screen, or border) -->
+   <SnapMode distance="10">border</SnapMode>
+
+   <!-- The move mode (outline or opaque) -->
+   <MoveMode>opaque</MoveMode>
+
+   <!-- The resize mode (outline or opaque) -->
+   <ResizeMode>opaque</ResizeMode>
+
+   <!--
+	<StartupCommand>gkrellm</StartupCommand>
+   -->
+
+   <!-- Key bindings -->
+   <Key key="Up">up</Key>
+   <Key key="Down">down</Key>
+   <Key key="Right">right</Key>
+   <Key key="Left">left</Key>
+   <Key key="h">left</Key>
+   <Key key="j">down</Key>
+   <Key key="k">up</Key>
+   <Key key="l">right</Key>
+   <Key key="Return">select</Key>
+   <Key key="Escape">escape</Key>
+
+   <Key mask="C" key="Tab">next</Key>
+   <Key mask="A" key="Tab">next</Key>
+
+   <Key mask="C" key="w">close</Key>
+   <Key mask="C" key="q">close</Key>
+
+   <Key mask="C" key="Escape">root:1</Key>
+   <Key mask="S" key="Escape">window</Key>
+
+   <Key mask="C" key="#">desktop#</Key>
+   <Key mask="C" key="Enter">maximize</Key>
+
+   <Key mask="C" key="Right">rdesktop</Key>
+   <Key mask="C" key="Left">ldesktop</Key>
+   <Key mask="C" key="Up">udesktop</Key>
+   <Key mask="C" key="Down">ddesktop</Key>
+</JWM>
+
