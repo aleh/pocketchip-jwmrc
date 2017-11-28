@@ -2,7 +2,7 @@
 <JWM>
    <!-- vim: set expandtab ts=3 sw=3 ai : -->
 
-   <RootMenu height="20" onroot="12">
+   <RootMenu height="18" onroot="12">
 
       <Program icon="terminal.png" label="Terminal">vala-terminal -fs 8</Program>
       
@@ -32,18 +32,19 @@
    </RootMenu>
 
    <Group>
-      <Name>vala-terminal|leafpad</Name>
+      <Name>vala-terminal|leafpad|pcmanfm|surf</Name>
       <Option>maximized</Option>
    </Group>
 
    <Group>
-      <Name>sunvox|pico|pcmanfm|surf</Name>
+      <Name>sunvox|pico</Name>
       <Option>notitle</Option>
       <Option>noborder</Option>
    </Group>
 
    <Group>
-      <Name>VisualBoyAdvance</Name>
+      <Name>*</Name>
+      <Option>layer:12</Option>
    </Group>
 
 
@@ -64,7 +65,7 @@
       </Swallow>
       -->
 
-      <Clock format="%H:%M"/>
+      <Clock format="%H:%M" zone=":Europe/Amsterdam"/>
 
    </Tray>
 
@@ -135,6 +136,7 @@
    </MenuStyle>
 
    <PopupStyle>
+      <Enabled>false</Enabled>
       <Font>Sans-8</Font>
       <Outline>white</Outline>
       <Foreground>black</Foreground>
