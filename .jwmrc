@@ -22,17 +22,19 @@
       <Separator/>
 
       <Menu label="More">
-         <Program label="Shutdown">vala-terminal -e sudo shutdown now</Program>
-         <Program label="Reboot">vala-terminal -e sudo reboot</Program>
+         <Program label="Shutdown">systemctl poweroff</Program>
+         <Program label="Reboot">systemctl reboot</Program>
          <Separator/>
-         <Restart label="Reload .jwmrc" icon="restart.png"/>
-         <Exit label="Exit JWM" confirm="true" icon="quit.png"/>
+         <Program label="Screenshoot (Shift+Alt+3)">xfce4-screenshooter -d 1 -f -s /home/chip/Pictures</Program>
+         <Separator/>
+         <Restart label="Reload .jwmrc"/>
+         <Program label="Edit .jwmrc">leafpad --tab-width=3 ~/.jwmrc</Program>
       </Menu>
 
    </RootMenu>
 
    <Group>
-      <Name>vala-terminal|leafpad|pcmanfm|surf</Name>
+      <Name>.*</Name>
       <Option>maximized</Option>
    </Group>
 
@@ -43,10 +45,8 @@
    </Group>
 
    <Group>
-      <Name>*</Name>
-      <Option>layer:12</Option>
+      <Name>VisualBoyAdvance</Name>
    </Group>
-
 
    <Tray x="0" y="-1" height="20" autohide="bottom" layer="above">
 
@@ -183,6 +183,8 @@
    <Key key="l">right</Key>
    <Key key="Return">select</Key>
    <Key key="Escape">escape</Key>
+
+   <Key mask="SA" key="3">exec:xfce4-screenshooter -f -s /home/chip/Pictures</Key>
 
    <Key mask="C" key="Tab">next</Key>
    <Key mask="A" key="Tab">next</Key>
