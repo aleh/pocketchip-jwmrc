@@ -12,7 +12,7 @@
 
       <Program icon="filebrowser.png" label="File Manager">pcmanfm</Program>
       
-      <Program icon="webbrowser.png" label="Internet">surf -n -p google.com</Program>
+      <Program icon="webbrowser.png" label="Internet">surf -n -p -u "Mozilla/4.0 (PSP (PlayStation Portable); 2.00)" google.com</Program>
 
       <Program icon="texteditor.png" label="Text Editor">leafpad</Program>
       <Separator/>
@@ -20,6 +20,37 @@
       <Program icon="virtualboy.png" label="LSDJ">VisualBoyAdvance -1 /home/chip/lsdj.gb</Program>
 
       <Separator/>
+      
+      <Menu label="Sound">
+         <Program label="Enable Internal Speaker">
+            amixer sset 'Left Mixer Left DAC' playback on
+            amixer sset 'Power Amplifier Mixer' playback off
+            amixer sset 'Right Mixer Left DAC' playback off
+            amixer sset 'Right Mixer Right DAC' playback off
+         </Program>
+         <Program label="Disable Internal Speaker">
+            amixer sset 'Left Mixer Left DAC' playback off 
+            amixer sset 'Power Amplifier Mixer' playback off
+            amixer sset 'Right Mixer Left DAC' playback off
+            amixer sset 'Right Mixer Right DAC' playback off
+         </Program>
+         <Separator/>
+         <Program label="Low">amixer sset 'Power Amplifier' playback 40%</Program>
+         <Program label="Medium">amixer sset 'Power Amplifier' playback 50%</Program>
+         <Program label="High">amixer sset 'Power Amplifier' playback 70%</Program>
+         <Program label="Max">amixer sset 'Power Amplifier' playback 100%</Program>
+      </Menu>
+      <Menu label="Backlight">
+         <Program label="10%">echo "1" > /sys/class/backlight/backlight/brightness</Program>
+         <Program label="20%">echo "2" > /sys/class/backlight/backlight/brightness</Program>
+         <Program label="50%">echo "5" > /sys/class/backlight/backlight/brightness</Program>
+         <Program label="80%">echo "8" > /sys/class/backlight/backlight/brightness</Program>
+         <Program label="100%">echo "10" > /sys/class/backlight/backlight/brightness</Program>
+      </Menu>
+
+      <Menu label="WiFi">
+         <Program label="Configure">xfce4-terminal --hide-menubar --hide-toolbar -e nmtui</Program>
+      </Menu>
 
       <Menu label="More">
          <Program label="Shutdown">systemctl poweroff</Program>
@@ -48,7 +79,7 @@
       <Name>VisualBoyAdvance</Name>
    </Group>
 
-   <Tray x="0" y="-1" height="20" autohide="bottom" layer="above">
+   <Tray x="0" y="-1" height="20" autohide="left" layer="above"> 
 
       <TrayButton label="Start" popup="">root:1</TrayButton>
 
@@ -64,6 +95,9 @@
          xload -nolabel -bg black -fg white -hl white
       </Swallow>
       -->
+      <Swallow name="pocketchip-xbatt" width="50">
+         pocketchip-xbatt
+      </Swallow>
 
       <Clock format="%H:%M" zone=":Europe/Amsterdam"/>
 
@@ -193,6 +227,8 @@
    <Key mask="C" key="q">close</Key>
 
    <Key mask="C" key="Escape">root:1</Key>
+   <Key key="XF86PowerOff">showdesktop</Key>
+
    <Key mask="S" key="Escape">window</Key>
 
    <Key mask="C" key="#">desktop#</Key>
