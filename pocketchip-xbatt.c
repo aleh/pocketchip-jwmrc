@@ -22,23 +22,87 @@ static int read_battery_file(const char *name, int *value) {
 	return result;
 }
 
+static Display *display;
+static int screen;
+static Visual *visual;
+static Colormap colormap;
+static Window w;
+
+static int draw() {
+
+	int result = 1;
+
+	XftFont *font = NULL;
+	XftDraw *font_draw = NULL;
+	do {
+
+		GC gc = XCreateGC(display, w, 0, NULL);
+
+		font = XftFontOpenName(display, screen, "Sans-8");
+		if (!font)
+			break;
+
+		font_draw = XftDrawCreate(display, w, visual, colormap);
+		if (!font_draw) 
+			break;
+		
+		XftColor font_color;
+		XftColorAllocName(display, visual, colormap, "#ffffff", &font_color);
+
+		XftColor background_color;
+		XftColorAllocName(display, visual, colormap, "#ff007f", &background_color);
+
+		char buf[256];	
+
+		int gauge = 0;
+		if (read_battery_file("/usr/lib/pocketchip-batt/gauge", &gauge) == 0) {
+			sprintf(buf, "%d%%", gauge);
+		} else {
+			sprintf(buf, "?");
+		}
+
+		const int width = 50;
+		const int height = 18;
+
+		XftDrawRect(font_draw, &background_color, 0, 0, width, height);	
+
+		XGlyphInfo text_info;
+		XftTextExtents8(display, font, buf, strlen(buf), &text_info);
+
+		XftDrawString8(font_draw, &font_color, font, (width - text_info.width) / 2, 12, buf, strlen(buf));
+
+		XFlush(display);
+
+		result = 0;
+
+	} while (0);
+
+	if (font)
+		XftFontClose(display, font);
+
+	if (font_draw)
+		XftDrawDestroy(font_draw);
+
+	return result;
+}
+
 int main(int argc, char **argv) {
 	
-	Display *display = XOpenDisplay(NULL);
+	display = XOpenDisplay(NULL);
 	if (!display) {
 		fprintf(stderr, "Could not open the display\n");
 		return 1;
 	}
 
-	int screen = DefaultScreen(display);
+	screen = DefaultScreen(display);
 
-	Visual *visual = DefaultVisual(display, screen); 
-	Colormap colormap = DefaultColormap(display, screen); 
+	visual = DefaultVisual(display, screen); 
+	colormap = DefaultColormap(display, screen); 
 	
 	XColor background_xcolor;
 	XAllocNamedColor(display, colormap, "#ff007f", &background_xcolor, &background_xcolor);
 
-	Window w = XCreateSimpleWindow(
+	w = XCreateSimpleWindow(
 		display,
 		DefaultRootWindow(display),
 		0, 0, 50, 18,
@@ -51,56 +115,25 @@ int main(int argc, char **argv) {
 	class_hint->res_class = "pocketchip-xbatt";
 	XSetClassHint(display, w, class_hint);
 	
-	XSelectInput(display, w, StructureNotifyMask);
+	XSelectInput(display, w, StructureNotifyMask | ExposureMask);
+	
 	XMapWindow(display, w);
 
 	while (1) {
-		XEvent e;
-		XNextEvent(display, &e);
-		if (e.type == MapNotify)
-			break;
-	}
-
-	GC gc = XCreateGC(display, w, 0, NULL);
-
-	XftFont *font = XftFontOpenName(display, screen, "Sans-8");
-	if (!font) {
-		return 2;
-	}
-
-	XftDraw *font_draw = XftDrawCreate(display, w, visual, colormap);
-	if (!font_draw) {
-		return 3;
-	}
-	
-	XftColor font_color;
-	XftColorAllocName(display, visual, colormap, "#ffffff", &font_color);
-
-	XftColor background_color;
-	XftColorAllocName(display, visual, colormap, "#ff007f", &background_color);
-
-	char buf[256];	
-	while (1) {
-
-		int gauge = 0;
-		if (read_battery_file("/usr/lib/pocketchip-batt/gauge", &gauge) == 0) {
-			/*~
-			// Just for comparison, let's calculate the level using voltages like pocket-home does it.
-			const int max_voltage = 4250;
-			const int min_voltage = 3275;
-			int voltage_gauge = (voltage - min_voltage) * 100 / (max_voltage - min_voltage);
-			*/
-			sprintf(buf, "%d%%", gauge);
-		} else {
-			sprintf(buf, "?");
+		while (XPending(display)) {
+			XEvent e;
+			XNextEvent(display, &e);
+			switch (e.type) {
+				case MapNotify:
+					break;
+				case Expose:
+					draw();
+					break;
+			}
 		}
-
-		XftDrawRect(font_draw, &background_color, 0, 0, 50, 18);		
-		XftDrawString8(font_draw, &font_color, font, 0, 12, buf, strlen(buf));
-
-		XFlush(display);
-
-		sleep(5);
+		sleep(3);
 	}
+
+	return 0;
 }
 

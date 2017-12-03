@@ -37,13 +37,9 @@ Missing/TODO:
 
 	sudo apt-get install jwm
 
-2. Install this config:
+2. Install this config along a little X program that is used to display battery level:
 
-	wget https://raw.githubusercontent.com/aleh/pocketchip-jwmrc/master/.jwmrc -O ~/.jwmrc 
-
-3. Replace your .dmrc so JWM starts by default:
-
-	wget https://raw.githubusercontent.com/aleh/pocketchip-jwmrc/master/.dmrc -O ~/.dmrc
+	sudo make install	
 
 3. Reboot.
 
