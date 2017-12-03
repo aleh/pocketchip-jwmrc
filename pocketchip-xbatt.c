@@ -26,32 +26,48 @@ static Display *display;
 static int screen;
 static Visual *visual;
 static Colormap colormap;
-static Window w;
+static Window window;
+static XftColor font_color;
+static XftColor background_color;
+static XColor background_xcolor;
+
+static int draw_gauge(int x, int y, int width, int height, int percentage) {
+
+	GC gc = XCreateGC(display, window, 0, NULL);
+	if (!gc)
+		return;
+
+	XSetForeground(display, gc, font_color.pixel); 
+	
+	int w = width - 1;
+	XDrawRectangle(display, window, gc, x, y, w, height);
+	
+	int filled = (percentage * (w - 2) + 50) / 100;
+	XFillRectangle(display, window, gc, x + 1, y, filled, height);
+	XFillRectangle(display, window, gc, x + width, y + 2, 1, height - 3);
+
+	XFreeGC(display, gc);
+}
 
 static int draw() {
 
 	int result = 1;
 
+	XWindowAttributes attrs = {};
+	XGetWindowAttributes(display, window, &attrs);
+
 	XftFont *font = NULL;
 	XftDraw *font_draw = NULL;
 	do {
 
-		GC gc = XCreateGC(display, w, 0, NULL);
-
-		font = XftFontOpenName(display, screen, "Sans-8");
+		font = XftFontOpenName(display, screen, "Sans-8:bold");
 		if (!font)
 			break;
 
-		font_draw = XftDrawCreate(display, w, visual, colormap);
+		font_draw = XftDrawCreate(display, window, visual, colormap);
 		if (!font_draw) 
 			break;
 		
-		XftColor font_color;
-		XftColorAllocName(display, visual, colormap, "#ffffff", &font_color);
-
-		XftColor background_color;
-		XftColorAllocName(display, visual, colormap, "#ff007f", &background_color);
-
 		char buf[256];	
 
 		int gauge = 0;
@@ -61,15 +77,20 @@ static int draw() {
 			sprintf(buf, "?");
 		}
 
-		const int width = 50;
-		const int height = 18;
+		const int width = 70;
+		const int height = 18; 
 
 		XftDrawRect(font_draw, &background_color, 0, 0, width, height);	
+
+		const int gauge_width = 17;
+		const int gauge_height = 6;
+		const int p = 6;
+		draw_gauge(width - gauge_width - p, (height - gauge_height) / 2 - 1, gauge_width, gauge_height, gauge);
 
 		XGlyphInfo text_info;
 		XftTextExtents8(display, font, buf, strlen(buf), &text_info);
 
-		XftDrawString8(font_draw, &font_color, font, (width - text_info.width) / 2, 12, buf, strlen(buf));
+		XftDrawString8(font_draw, &font_color, font, (width - p - gauge_width - p - text_info.width), 12, buf, strlen(buf));
 
 		XFlush(display);
 
@@ -99,10 +120,11 @@ int main(int argc, char **argv) {
 	visual = DefaultVisual(display, screen); 
 	colormap = DefaultColormap(display, screen); 
 	
-	XColor background_xcolor;
 	XAllocNamedColor(display, colormap, "#ff007f", &background_xcolor, &background_xcolor);
+	XftColorAllocName(display, visual, colormap, "#ffffff", &font_color);
+	XftColorAllocName(display, visual, colormap, "#ff007f", &background_color);
 
-	w = XCreateSimpleWindow(
+	window = XCreateSimpleWindow(
 		display,
 		DefaultRootWindow(display),
 		0, 0, 50, 18,
@@ -113,11 +135,11 @@ int main(int argc, char **argv) {
 	XClassHint *class_hint = XAllocClassHint();
 	class_hint->res_name = "pocketchip-xbatt";
 	class_hint->res_class = "pocketchip-xbatt";
-	XSetClassHint(display, w, class_hint);
+	XSetClassHint(display, window, class_hint);
 	
-	XSelectInput(display, w, StructureNotifyMask | ExposureMask);
+	XSelectInput(display, window, StructureNotifyMask | ExposureMask);
 	
-	XMapWindow(display, w);
+	XMapWindow(display, window);
 
 	while (1) {
 		while (XPending(display)) {
@@ -127,7 +149,8 @@ int main(int argc, char **argv) {
 				case MapNotify:
 					break;
 				case Expose:
-					draw();
+					if (e.xexpose.count == 0)
+						draw();
 					break;
 			}
 		}
