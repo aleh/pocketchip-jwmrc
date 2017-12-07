@@ -71,8 +71,22 @@ static int draw() {
 		char buf[256];	
 
 		int gauge = 0;
-		if (read_battery_file("/usr/lib/pocketchip-batt/gauge", &gauge) == 0) {
+		int voltage = 0;
+		if (read_battery_file("/usr/lib/pocketchip-batt/voltage", &voltage) == 0) {
+
+			// I was using /usr/lib/pocketchip-batt/gauge previously which was set by pocketchip-one service, 
+			// but then thought that making it compatible with the standard pocketchip-batt service would be a good idea.
+			// The newer pocketchip-one will correct the voltage, so the level calculated this way will match the gauge.
+			const int max_voltage = 4250;
+            const int min_voltage = 3275;
+			gauge = 100 * (voltage - min_voltage) / (max_voltage - min_voltage);
+			if (gauge < 0)
+				gauge = 0;
+			if (gauge > 100)
+				gauge = 100;
+
 			sprintf(buf, "%d%%", gauge);
+
 		} else {
 			sprintf(buf, "?");
 		}
