@@ -42,7 +42,7 @@ static int draw_gauge(int x, int y, int width, int height, int percentage) {
 	int w = width - 1;
 	XDrawRectangle(display, window, gc, x, y, w, height);
 	
-	int filled = (percentage * (w - 2) + 50) / 100;
+	int filled = (percentage * (w - 1) + 50) / 100;
 	XFillRectangle(display, window, gc, x + 1, y, filled, height);
 	XFillRectangle(display, window, gc, x + width, y + 2, 1, height - 3);
 
