@@ -79,7 +79,7 @@
       <Name>VisualBoyAdvance</Name>
    </Group>
 
-   <Tray x="0" y="-1" height="20" autohide="left" layer="above"> 
+   <Tray x="0" y="-1" height="20" autohide="off" layer="normal"> 
 
       <TrayButton label="Start" popup="">root:1</TrayButton>
 
@@ -95,7 +95,7 @@
          xload -nolabel -bg black -fg white -hl white
       </Swallow>
       -->
-      <Swallow name="pocketchip-xbatt" width="50">
+      <Swallow name="pocketchip-xbatt" width="70">
          pocketchip-xbatt
       </Swallow>
 
