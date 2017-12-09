@@ -5,20 +5,14 @@
    <RootMenu height="18" onroot="12">
 
       <Program icon="terminal.png" label="Terminal">vala-terminal -fs 8</Program>
-      
       <Program icon="pico8.png" label="PICO-8">pico8</Program>
-
       <Program icon="musicsequencer.png" label="SunVox">sunvox</Program>
-
       <Program icon="filebrowser.png" label="File Manager">pcmanfm</Program>
-      
       <Program icon="webbrowser.png" label="Internet">surf -n -p -u "Mozilla/4.0 (PSP (PlayStation Portable); 2.00)" google.com</Program>
-
       <Program icon="texteditor.png" label="Text Editor">leafpad</Program>
       <Separator/>
 
       <Program icon="virtualboy.png" label="LSDJ">VisualBoyAdvance -1 /home/chip/lsdj.gb</Program>
-
       <Separator/>
       
       <Menu label="Sound">
@@ -40,6 +34,7 @@
          <Program label="High">amixer sset 'Power Amplifier' playback 70%</Program>
          <Program label="Max">amixer sset 'Power Amplifier' playback 100%</Program>
       </Menu>
+
       <Menu label="Backlight">
          <Program label="10%">echo "1" > /sys/class/backlight/backlight/brightness</Program>
          <Program label="20%">echo "2" > /sys/class/backlight/backlight/brightness</Program>
@@ -55,26 +50,33 @@
       <Menu label="More">
          <Program label="Shutdown">systemctl poweroff</Program>
          <Program label="Reboot">systemctl reboot</Program>
+         <Exit label="Log Out"/>
          <Separator/>
+
          <Program label="Screenshoot (Shift+Alt+3)">xfce4-screenshooter -d 1 -f -s /home/chip/Pictures</Program>
          <Separator/>
+
          <Restart label="Reload .jwmrc"/>
          <Program label="Edit .jwmrc">leafpad --tab-width=3 ~/.jwmrc</Program>
       </Menu>
 
    </RootMenu>
 
+   <!-- By default we run all the programs maximized. -->
    <Group>
       <Name>.*</Name>
       <Option>maximized</Option>
    </Group>
 
+   <!-- These have own preferences. -->
    <Group>
       <Name>sunvox|pico</Name>
       <Option>notitle</Option>
       <Option>noborder</Option>
+      <Option>maximized</Option>
    </Group>
 
+   <!-- Programs that should not run maximized -->
    <Group>
       <Name>VisualBoyAdvance</Name>
    </Group>
@@ -89,15 +91,8 @@
 
       <Dock/>
 
-      <!-- Additional Swallow attribute: height -->
-      <!--
-      <Swallow name="xload" width="64">
-         xload -nolabel -bg black -fg white -hl white
-      </Swallow>
-      -->
-      <Swallow name="pocketchip-xbatt" width="70">
-         pocketchip-xbatt
-      </Swallow>
+      <!-- Here an external X program (our battery status one) is started and is wrapped into the tray. -->
+      <Swallow name="pocketchip-xbatt" width="70">pocketchip-xbatt --text=#ffffff --background=#ff007f</Swallow>
 
       <Clock format="%H:%M" zone=":Europe/Amsterdam"/>
 

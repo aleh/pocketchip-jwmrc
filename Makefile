@@ -4,5 +4,6 @@ pocketchip-xbatt: pocketchip-xbatt.c
 
 install: pocketchip-xbatt .jwmrc
 	cp -f ./pocketchip-xbatt /usr/bin/pocketchip-xbatt
-	cp .jwmrc .dmrc ~/
+	cp .jwmrc /home/chip/
+	cp .dmrc /home/chip/
 	sudo -u chip jwm -display :0 -restart
