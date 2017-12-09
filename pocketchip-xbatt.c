@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <getopt.h>
 
 static int read_battery_file(const char *name, int *value) {
 
@@ -30,7 +31,10 @@ static Colormap colormap;
 static Window window;
 static XftColor font_color;
 static XftColor background_color;
-static XColor background_xcolor;
+
+static char *font_name = "Sans-8:bold";
+static char *foreground_color_name = "#ffffff";
+static char *background_color_name = "#ff007f";
 
 static int draw_gauge(int x, int y, int width, int height, int percentage, int charging) {
 
@@ -71,7 +75,7 @@ static int draw() {
 
 	do {
 
-		font = XftFontOpenName(display, screen, "Sans-8:bold");
+		font = XftFontOpenName(display, screen, font_name); 
 		if (!font)
 			break;
 
@@ -139,7 +143,45 @@ static int draw() {
 	return result;
 }
 
+static void usage() {
+	printf(
+		"\n"
+		"Draws battery indicator on Pocket CHIP which can be swollowed by JWM's tray.\n"
+		"\n"
+		"Usage:\n"
+		"\tpocketchip-xbatt [-fc foeground_color] [-bc background_color] [-font font]\n"
+		"\n"
+	);
+}
+
 int main(int argc, char **argv) {
+
+	static struct option longopts[] = {
+		{ "text", optional_argument, NULL, 't' },
+		{ "background", optional_argument, NULL, 'b' },
+		{ "font", optional_argument, NULL, 'f' },
+		{ 0 }
+	};
+
+	int ch;
+	while ((ch = getopt_long_only(argc, argv, "", longopts, NULL)) != -1) {
+		switch (ch) {
+			case 'f':
+				font_name = optarg;
+				break;
+			case 't':
+				foreground_color_name = optarg;
+				break;
+			case 'b':
+				background_color_name = optarg;
+				break;
+			case 0:
+				break;
+			default:
+				usage();
+				return 0;
+		}
+	}
 	
 	display = XOpenDisplay(NULL);
 	if (!display) {
@@ -154,16 +196,15 @@ int main(int argc, char **argv) {
 	visual = DefaultVisual(display, screen); 
 	colormap = DefaultColormap(display, screen); 
 	
-	XAllocNamedColor(display, colormap, "#ff007f", &background_xcolor, &background_xcolor);
-	XftColorAllocName(display, visual, colormap, "#ffffff", &font_color);
-	XftColorAllocName(display, visual, colormap, "#ff007f", &background_color);
+	XftColorAllocName(display, visual, colormap, foreground_color_name, &font_color);
+	XftColorAllocName(display, visual, colormap, background_color_name, &background_color);
 
 	window = XCreateSimpleWindow(
 		display,
 		DefaultRootWindow(display),
 		0, 0, 50, 18,
-		0, background_xcolor.pixel, 
-		background_xcolor.pixel 
+		0, background_color.pixel, 
+		background_color.pixel 
 	);
 
 	XClassHint *class_hint = XAllocClassHint();
