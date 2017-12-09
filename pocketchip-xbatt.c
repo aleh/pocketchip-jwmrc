@@ -1,4 +1,7 @@
-// vim: sw=4 ts=4
+/* 
+ * A little program displaying battery level on PocketCHIP. 
+ * Supposed to be swallowed by JWM.
+ */
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -11,14 +14,11 @@
 static int read_battery_file(const char *name, int *value) {
 
 	FILE *f = fopen(name, "r");
-	if (!f) {
+	if (!f)
 		return -1;
-	}
 
 	int result = fscanf(f, "%d", value) >= 1 ? 0 : -1;
-
 	fclose(f);
-
 	return result;
 }
 
@@ -31,20 +31,30 @@ static XftColor font_color;
 static XftColor background_color;
 static XColor background_xcolor;
 
-static int draw_gauge(int x, int y, int width, int height, int percentage) {
+static int draw_gauge(int x, int y, int width, int height, int percentage, int charging) {
 
 	GC gc = XCreateGC(display, window, 0, NULL);
 	if (!gc)
 		return;
 
+	XGCValues values;
+	if (charging) {
+		values.line_style = LineOnOffDash;
+	} else {
+		values.line_style = LineSolid;
+	}
+	XChangeGC(display, gc, GCLineStyle, &values);
+
 	XSetForeground(display, gc, font_color.pixel); 
 	
 	int w = width - 1;
+	XDrawRectangle(display, window, gc, x + w, y + 2, 1, height - 4);
+
+	XSetDashes(display, gc, 0, (char[]){ 1, 1 }, 2);
 	XDrawRectangle(display, window, gc, x, y, w, height);
-	
-	int filled = (percentage * (w - 1) + 50) / 100;
-	XFillRectangle(display, window, gc, x + 1, y, filled, height);
-	XFillRectangle(display, window, gc, x + width, y + 2, 1, height - 3);
+
+	int filled = (percentage * (w - 2) + 50) / 100;
+	XFillRectangle(display, window, gc, x + 1, y + 1, filled, height - 1);
 
 	XFreeGC(display, gc);
 }
@@ -58,6 +68,7 @@ static int draw() {
 
 	XftFont *font = NULL;
 	XftDraw *font_draw = NULL;
+
 	do {
 
 		font = XftFontOpenName(display, screen, "Sans-8:bold");
@@ -72,6 +83,7 @@ static int draw() {
 
 		int gauge = 0;
 		int voltage = 0;
+		int charging = 0;
 		if (read_battery_file("/usr/lib/pocketchip-batt/voltage", &voltage) == 0) {
 
 			// I was using /usr/lib/pocketchip-batt/gauge previously which was set by pocketchip-one service, 
@@ -91,6 +103,11 @@ static int draw() {
 			sprintf(buf, "?");
 		}
 
+		if (read_battery_file("/usr/lib/pocketchip-batt/charging", &charging) != 0) {
+			charging = 0;
+		}
+
+		// TODO: use the actual window size here
 		const int width = 70;
 		const int height = 18; 
 
@@ -99,11 +116,12 @@ static int draw() {
 		const int gauge_width = 17;
 		const int gauge_height = 6;
 		const int p = 6;
-		draw_gauge(width - gauge_width - p, (height - gauge_height) / 2 - 1, gauge_width, gauge_height, gauge);
+		draw_gauge(width - gauge_width - p, (height - gauge_height) / 2 - 1, gauge_width, gauge_height, gauge, charging);
 
 		XGlyphInfo text_info;
 		XftTextExtents8(display, font, buf, strlen(buf), &text_info);
 
+		// TODO: calculate vertical offset
 		XftDrawString8(font_draw, &font_color, font, (width - p - gauge_width - p - text_info.width), 12, buf, strlen(buf));
 
 		XFlush(display);
@@ -174,3 +192,4 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
+// vim: sw=4 ts=4
