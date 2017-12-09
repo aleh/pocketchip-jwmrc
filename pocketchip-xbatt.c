@@ -23,6 +23,7 @@ static int read_battery_file(const char *name, int *value) {
 }
 
 static Display *display;
+static int x11_fd;
 static int screen;
 static Visual *visual;
 static Colormap colormap;
@@ -37,6 +38,11 @@ static int draw_gauge(int x, int y, int width, int height, int percentage, int c
 	if (!gc)
 		return;
 
+	XSetForeground(display, gc, font_color.pixel); 
+	
+	int w = width - 1;
+	XDrawRectangle(display, window, gc, x + w, y + 2, 1, height - 4);
+
 	XGCValues values;
 	if (charging) {
 		values.line_style = LineOnOffDash;
@@ -44,16 +50,10 @@ static int draw_gauge(int x, int y, int width, int height, int percentage, int c
 		values.line_style = LineSolid;
 	}
 	XChangeGC(display, gc, GCLineStyle, &values);
-
-	XSetForeground(display, gc, font_color.pixel); 
-	
-	int w = width - 1;
-	XDrawRectangle(display, window, gc, x + w, y + 2, 1, height - 4);
-
 	XSetDashes(display, gc, 0, (char[]){ 1, 1 }, 2);
 	XDrawRectangle(display, window, gc, x, y, w, height);
 
-	int filled = (percentage * (w - 2) + 50) / 100;
+	int filled = (percentage * (w - 1) + 50) / 100;
 	XFillRectangle(display, window, gc, x + 1, y + 1, filled, height - 1);
 
 	XFreeGC(display, gc);
@@ -147,6 +147,8 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
+	x11_fd = ConnectionNumber(display);
+
 	screen = DefaultScreen(display);
 
 	visual = DefaultVisual(display, screen); 
@@ -172,8 +174,25 @@ int main(int argc, char **argv) {
 	XSelectInput(display, window, StructureNotifyMask | ExposureMask);
 	
 	XMapWindow(display, window);
+	XFlush(display);
 
 	while (1) {
+
+		if (!XPending(display)) {	
+			fd_set fds;
+			FD_ZERO(&fds);
+			FD_SET(x11_fd, &fds);
+
+			struct timeval timeout = { 0 };
+			timeout.tv_sec = 5;
+
+			int num_ready = select(x11_fd + 1, &fds, NULL, NULL, &timeout);
+			if (num_ready == 0) {
+				draw();
+				continue;
+			}
+		}
+
 		while (XPending(display)) {
 			XEvent e;
 			XNextEvent(display, &e);
@@ -186,7 +205,6 @@ int main(int argc, char **argv) {
 					break;
 			}
 		}
-		sleep(3);
 	}
 
 	return 0;
